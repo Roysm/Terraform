@@ -1,0 +1,17 @@
+1. Get all
+kubectl get all -A
+
+2. Get pod deployment/service:
+kubectl get pod -n deployment <pod_name> -o yaml
+kubectl get service -n deployment <pod_name> -o yaml
+
+3. Get pod specific infromation:
+kubectl get pod <pod_name> -n deployment -o=jsonpath='{.metadata.labels.app}'
+
+
+4. Restart all daemonsets,deployments,statefulset: for specific namespace
+kubectl -n argocd rollout restart daemonsets,deployments,statefulset
+
+5. stop/start k3s service
+sudo systemctl stop k3s
+sudo systemctl start k3s

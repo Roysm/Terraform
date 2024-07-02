@@ -1,0 +1,34 @@
+ssh into vm:
+https://averagelinuxuser.com/ssh-into-virtualbox/
+https://www.golinuxcloud.com/ssh-into-virtualbox-vm/
+1.sudo apt install openssh-server
+2.sudo systemctl status ssh
+
+Add user as sudoer:
+usermod -aG sudo username
+
+How to install helm:
+https://helm.sh/docs/intro/install/
+
+k3s installation:
+https://docs.k3s.io/quick-start
+
+argocd installation:
+https://lumochift.org/blog/k3s-argocd
+
+how to uninstall argocd:
+https://stackoverflow.com/questions/70661683/how-to-uninstall-argocd-from-kubernetes-cluster
+
+
+
+Troubleshooting:
+
+Error:
+Unable to Reach Kubernetes Cluster: Connection Refused When Attempting to Connect to http://localhost:8080/version?timeout=32s with Error dial tcp 127.0.0.1:8080
+
+Solution:
+kubectl config view --raw > ~/.kube/config
+https://copyprogramming.com/howto/error-kubernetes-cluster-unreachable-get-http-localhost-8080-version-timeout-32s-dial-tcp-127-0-0-1-8080-connect-connection-refused
+
+Delete namespace:
+kubectl delete ns <namespace>

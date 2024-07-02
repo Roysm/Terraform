@@ -1,0 +1,97 @@
+Ansible AWX Deployment Using k3s
+** https://opensource.sa/?p=1865
+** https://github.com/ansible/awx-operator/releases/tag/2.9.0
+
+mkdir ~/awx
+cd ~/awx
+
+1. Clone operator deployment code
+git clone https://github.com/ansible/awx-operator.git
+
+2. Create namespace where operator will be deployed. I’ll name mine awx
+export NAMESPACE=awx
+kubectl create ns ${NAMESPACE}
+
+
+3. Set current context to value set in NAMESPACE variable
+kubectl config set-context –current –namespace=$NAMESPACE
+
+4. Switch to awx-operator directory
+cd awx-operator/
+
+5. Save the latest version from AWX Operator releases as RELEASE_TAG variable
+RELEASE_TAG=2.9.0
+
+6. Deploy AWX Operator into your cluster
+export NAMESPACE=awx
+make deploy
+
+7. Wait a few minutes and awx-operator should be running
+kubectl get pods -n awx
+
+8. Create PVC
+sudo nano public-static-pvc.yaml
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: public-static-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi
+```
+- Apply configuration manifest:
+kubectl apply -f public-static-pvc.yaml -n awx
+
+- PVC won’t be bound until the pod that uses it is created.
+kubectl get pvc -n awx
+
+9. Create AWX deployment file
+sudo nano awx-instance-deployment.yml
+```
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx
+spec:
+  service_type: nodeport  
+  projects_persistence: true
+  projects_storage_access_mode: ReadWriteOnce
+  web_extra_volume_mounts: |
+    - name: static-data
+      mountPath: /var/lib/projects
+  extra_volumes: |
+    - name: static-data
+      persistentVolumeClaim:
+        claimName: public-static-data-pvc
+```
+- Apply configuration manifest:
+kubectl apply -f awx-instance-deployment.yml -n awx
+
+- Extra PVCs are created automatically
+kubectl  get pvc
+
+10. Get the AWX Web service port
+kubectl get service -n awx
+
+11. To have access to AWX web console, point your browser to your Ansible’s AWX server IP
+http://your-server-ip-address:<port>
+
+Username: admin
+Password:
+sudo k3s kubectl -n awx get secret awx-admin-password -o jsonpath="{.data.password}" | base64 -d
+
+
+
+_______________________________________________________________
+
+
+offline installation:
+
+https://raw.githubusercontent.com/ansible/awx-operator/0.13.0/deploy/awx-operator.yaml
+

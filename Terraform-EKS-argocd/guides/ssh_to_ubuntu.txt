@@ -1,0 +1,15 @@
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install openssh-client
+
+
+sudo systemctl start ssh
+sudo systemctl stop ssh
+sudo systemctl restart ssh
+
+sudo systemctl status ssh
+
+ - locate enp0s3 on ifconfig
+    ssh:
+
+    soroy@10.0.0.3
